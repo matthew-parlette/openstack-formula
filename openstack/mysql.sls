@@ -21,6 +21,7 @@ mysql-server:
 {% for user in ['keystone'] %}
 {{ user }}-db:
   mysql_user.present:
+    - name: {{ user }}
     - host: "%"
     - password: {{ pillar['openstack']['database'][user] }}
     - require:
@@ -30,6 +31,7 @@ mysql-server:
       - service: mysql-server
   mysql_database:
     - present
+    - name: {{ user }}
     - require:
       - pkg: mysql-server
       - file: /etc/mysql/my.cnf
