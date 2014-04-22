@@ -18,7 +18,7 @@ mysql-server:
     - watch:
       - file: /etc/mysql/my.cnf
 
-{% for user in ['keystone'] %}
+{% for user in ['keystone','glance'] %}
 {{ user }}-db:
   mysql_user.present:
     - name: {{ user }}
@@ -32,6 +32,8 @@ mysql-server:
   mysql_database:
     - present
     - name: {{ user }}
+    - charset: utf8
+    - collate: utf8_general_ci
     - require:
       - pkg: mysql-server
       - file: /etc/mysql/my.cnf

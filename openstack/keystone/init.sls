@@ -6,6 +6,7 @@ keystone:
       - pkg: keystone
       - service: mysql-server
       - mysql_database: keystone-db
+      - cmd: keystone-db-sync
     - watch:
       - file: /etc/keystone
   pkg:
@@ -15,6 +16,9 @@ keystone-db-sync:
   cmd:
     - run
     - name: keystone-manage db_sync
+    - require:
+      - pkg: keystone
+      - mysql_database: keystone-db
 
 /etc/keystone:
   file:
@@ -84,6 +88,7 @@ keystone-service-{{ service }}:
     - unless: {{ keystone_cmd }} service-get {{ service }}
     - require:
       - service: keystone
+      - cmd: keystone-db-sync
 
 {% set adminurl = salt['pillar.get']('openstack:service:' ~ service ~ ':endpoint:adminurl','') %}
 {% set internalurl = salt['pillar.get']('openstack:service:' ~ service ~ ':endpoint:internalurl','') %}
@@ -97,4 +102,5 @@ keystone-endpoint-{{ service }}:
     - require:
       - service: keystone
       - cmd: keystone-service-{{ service }}
+
 {% endfor %}

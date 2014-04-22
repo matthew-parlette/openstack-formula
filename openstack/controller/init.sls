@@ -3,7 +3,7 @@ include:
   - rabbitmq
   - openstack.mysql
   # - openstack.nova
-  # - openstack.glance
+  - openstack.glance
   - openstack.keystone
   # - openstack.horizon
 
