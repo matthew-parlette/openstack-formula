@@ -66,11 +66,12 @@ keystone-role-{{ role }}:
     {% for user in salt['pillar.get']('openstack:user-role:' ~ tenant ~ ':' ~ role,[]) %}
 keystone-{{ tenant }}-{{ user }}-{{ role }}-assignment:
   cmd:
-    - run
+    - wait
     - name: {{ keystone_cmd }} user-role-add --user={{ user }} --tenant={{ tenant }} --role={{ role }}
     - unless: {{ keystone_cmd }} user-role-list | grep {{ user }}
     - require:
       - service: keystone
+    - watch:
       - cmd: keystone-tenant-{{ tenant }}
       - cmd: keystone-user-{{ user }}
       - cmd: keystone-role-{{ role }}
@@ -96,7 +97,7 @@ keystone-service-{{ service }}:
 
 keystone-endpoint-{{ service }}:
   cmd:
-    - run
+    - wait
     - name: {{ keystone_cmd }} endpoint-create --service-id=`{{ keystone_cmd }} service-get {{ service }} | grep ' id ' | awk '{print $4}'` --adminurl={{ adminurl }} --internalurl={{ internalurl }} --publicurl={{ publicurl }}
     - unless: {{ keystone_cmd }} endpoint-get --service {{ type }}
     - require:
